@@ -1,6 +1,5 @@
 package com.example.touchchallenge;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,10 +16,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.touchchallenge.classes.ScoreboardListAdapter;
+import com.example.touchchallenge.activities.SettingsActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class MainActivity extends AppCompatActivity {
@@ -36,7 +33,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setupToolbar();
-        setupFab();
         time = this.getString(R.string.time);
         startNewGame();
         time_list = new String[10];
@@ -48,15 +44,6 @@ public class MainActivity extends AppCompatActivity {
     private void setupToolbar() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-    }
-
-    private void setupFab() {
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(view -> handleFABClick());
-    }
-
-    private void handleFABClick() {
-
     }
 
     private void startNewGame(){
@@ -87,7 +74,9 @@ public class MainActivity extends AppCompatActivity {
             });
             for(int i = 0; i < 10; i++){
                 for(int j = i + 1; j < 10; j++){
-                    if(Integer.valueOf(time_list[i]) < Integer.valueOf(time_list[j])) {
+                    
+                    if(Integer.valueOf(time_list[i].replaceAll(":", ""))
+                            < Integer.valueOf(time_list[j].replaceAll(":", ""))) {
                         String temp = time_list[i];
                         time_list[i] = time_list[j];
                         time_list[j] = temp;
@@ -95,7 +84,20 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             for(int i = 0; i < 10; i++){
-                if(Integer.valueOf(time) > Integer.valueOf(time_list[i])){
+                for(int j = i + 1; j < 10; j++){
+
+                    if(Integer.valueOf(time_list[i].replaceAll(":", ""))
+                            < Integer.valueOf(time_list[j].replaceAll(":", ""))) {
+                        String temp = time_list[i];
+                        time_list[i] = time_list[j];
+                        time_list[j] = temp;
+                    }
+                }
+            }
+            for(int i = 0; i < 10; i++){
+                if(Integer.valueOf(time.replaceAll(":", "")) >
+                        Integer.valueOf(time_list[i].replaceAll(":", ""))){
+                    String temp = time_list[i];
                     time_list[i] = time;
                     break;
                 }
@@ -124,10 +126,33 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            showSettings();
+            return true;
+        }
+        else if(id == R.id.action_about){
+            showAbout();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showSettings() {
+        Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+        startActivity(intent);
+    }
+
+    private void showAbout() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(this.getString(R.string.about)).setTitle(R.string.app_name)
+                .setIcon(ContextCompat.getDrawable(this, R.mipmap.ic_launcher)).setCancelable(true);
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
+        builder.create();
+        builder.show();
     }
 
     private void resetTimer(){
@@ -151,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
     };
 
     public void goToDashboard(View view) {
-        Intent intent = new Intent(getApplicationContext(), DashboardActivity.class);
+        Intent intent = new Intent(getApplicationContext(), ScoreboardActivity.class);
         intent.putExtra("list", time_list);
         startActivity(intent);
     }

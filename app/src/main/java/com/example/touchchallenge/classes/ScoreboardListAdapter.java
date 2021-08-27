@@ -3,7 +3,6 @@ package com.example.touchchallenge.classes;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,7 +24,7 @@ public class ScoreboardListAdapter extends RecyclerView.Adapter<ScoreboardListHo
     @Override
     public ScoreboardListHolder onCreateViewHolder(@NonNull  ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.dashboard_list, parent, false);
+                .inflate(R.layout.scoreboard_list, parent, false);
         return new ScoreboardListHolder(view);
     }
 

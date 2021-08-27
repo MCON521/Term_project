@@ -10,9 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.lang.ref.WeakReference;
-
-public class DashboardActivity extends AppCompatActivity {
+public class ScoreboardActivity extends AppCompatActivity {
 
     private ScoreboardListAdapter mAdapter;
     private String[] list;
@@ -20,7 +18,7 @@ public class DashboardActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_dashboard);
+        setContentView(R.layout.activity_scoreboard);
         list = getIntent().getStringArrayExtra("list");
         setupAdapter(list);
         setupToolbar();

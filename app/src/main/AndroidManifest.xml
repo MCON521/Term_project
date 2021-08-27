@@ -9,10 +9,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TouchChallenge">
+        <activity android:name=".activities.SettingsActivity"></activity>
         <activity
-            android:name=".DashboardActivity"
+            android:name=".ScoreboardActivity"
             android:label="@string/title_activity_dashboard"
-            android:theme="@style/Theme.TouchChallenge.NoActionBar"></activity>
+            android:theme="@style/Theme.TouchChallenge.NoActionBar" />
         <activity
             android:name=".SplashActivity"
             android:theme="@style/Theme.TouchChallenge.NoActionBar.SplashScreenTheme">
