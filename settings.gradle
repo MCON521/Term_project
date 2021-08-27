@@ -1,0 +1,2 @@
+rootProject.name = "Touch Challenge"
+include ':app'
