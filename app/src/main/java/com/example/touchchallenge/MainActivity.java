@@ -109,10 +109,7 @@ public class MainActivity extends AppCompatActivity {
         time = this.getString(R.string.time);
         startNewGame();
         mKEY_AUTO_SAVE = getString(R.string.auto_save_key);
-        time_list = new String[10];
-        for(int i = 0; i < 10; i++){
-            time_list[i] = time;
-        }
+        resetScoreboard();
     }
 
     private void setupToolbar() {
@@ -194,8 +191,19 @@ public class MainActivity extends AppCompatActivity {
             showAbout();
             return true;
         }
+        else if(id == R.id.action_reset){
+            resetScoreboard();
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void resetScoreboard() {
+        time_list = new String[10];
+        for(int i = 0; i < 10; i++){
+            time_list[i] = time;
+        }
     }
 
     private void showSettings() {

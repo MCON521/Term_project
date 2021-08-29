@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    tools:showIn="@layout/content_main">
+
+
+    <include layout="@layout/main_include_scoreboard_button_and_instruction" />
+
+    <include layout="@layout/main_include_button_and_timer" />
+</merge>
