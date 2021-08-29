@@ -2,6 +2,7 @@ package com.example.touchchallenge;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
@@ -12,13 +13,15 @@ import android.widget.Button;
 import android.widget.TextView;
 
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 
 import com.example.touchchallenge.activities.SettingsActivity;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import static androidx.preference.PreferenceManager.getDefaultSharedPreferences;
 
 public class MainActivity extends AppCompatActivity {
     private Handler handler = new Handler();
@@ -27,6 +30,76 @@ public class MainActivity extends AppCompatActivity {
     private int seconds = 0;
     private boolean check = true;
     private String time_list[];
+    private boolean mUseAutoSave;
+    private final String mKEY_TIME = "Time";
+    private String mKEY_AUTO_SAVE;
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        saveOrDeleteGameInSharedPrefs();
+    }
+
+    private void saveOrDeleteGameInSharedPrefs() {
+        SharedPreferences defaultSharedPreferences = getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = defaultSharedPreferences.edit();
+
+        // Save current game or remove any prior game to/from default shared preferences
+        if (mUseAutoSave)
+            for(int i = 0; i < 10; i++){
+                editor.putString(mKEY_TIME + (i + 1), time_list[i]);
+            }
+        else
+            for(int i = 0; i < 10; i++){
+                editor.remove(mKEY_TIME + (i + 1));
+            }
+        editor.apply();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        restoreFromPreferences_SavedGameIfAutoSaveWasSetOn();
+        restoreOrSetFromPreferences_AllAppAndGameSettings();
+    }
+    private void restoreFromPreferences_SavedGameIfAutoSaveWasSetOn() {
+        SharedPreferences defaultSharedPreferences = getDefaultSharedPreferences(this);
+        if (defaultSharedPreferences.getBoolean(mKEY_AUTO_SAVE,true)) {
+            for(int i = 0; i < 10; i++){
+                String gameString = defaultSharedPreferences.getString(mKEY_TIME + (i + 1), null);
+
+                if (gameString != null) {
+                    time_list[i] = gameString;
+                }
+            }
+        }
+    }
+
+    private void restoreOrSetFromPreferences_AllAppAndGameSettings() {
+        SharedPreferences sp = getDefaultSharedPreferences(this);
+        mUseAutoSave = sp.getBoolean(mKEY_AUTO_SAVE, true);
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        for(int i = 0; i < 10; i++){
+            outState.putString(mKEY_TIME + (i + 1), time_list[i]);
+        }
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        for(int i = 0; i < 10; i++){
+            String gameString = savedInstanceState.getString(mKEY_TIME + (i + 1));
+            if (gameString != String.valueOf(R.string.time)) {
+                time_list[i] = gameString;
+            }
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
         setupToolbar();
         time = this.getString(R.string.time);
         startNewGame();
+        mKEY_AUTO_SAVE = getString(R.string.auto_save_key);
         time_list = new String[10];
         for(int i = 0; i < 10; i++){
             time_list[i] = time;
@@ -72,33 +146,20 @@ public class MainActivity extends AppCompatActivity {
                     check = true;
                 }
             });
-            for(int i = 0; i < 10; i++){
-                for(int j = i + 1; j < 10; j++){
-                    
-                    if(Integer.valueOf(time_list[i].replaceAll(":", ""))
-                            < Integer.valueOf(time_list[j].replaceAll(":", ""))) {
-                        String temp = time_list[i];
-                        time_list[i] = time_list[j];
-                        time_list[j] = temp;
-                    }
-                }
-            }
-            for(int i = 0; i < 10; i++){
-                for(int j = i + 1; j < 10; j++){
 
-                    if(Integer.valueOf(time_list[i].replaceAll(":", ""))
-                            < Integer.valueOf(time_list[j].replaceAll(":", ""))) {
-                        String temp = time_list[i];
-                        time_list[i] = time_list[j];
-                        time_list[j] = temp;
-                    }
-                }
-            }
             for(int i = 0; i < 10; i++){
-                if(Integer.valueOf(time.replaceAll(":", "")) >
-                        Integer.valueOf(time_list[i].replaceAll(":", ""))){
+                if(Integer.parseInt(time.replaceAll(":", "")) >
+                        Integer.parseInt(time_list[i].replaceAll(":", ""))){
                     String temp = time_list[i];
                     time_list[i] = time;
+                    for(int j = i; j < 10; j++){
+                        if(Integer.parseInt(temp.replaceAll(":", "")) >
+                                Integer.parseInt(time_list[j].replaceAll(":", ""))){
+                            String temp2 = time_list[j];
+                            time_list[j] = temp;
+                            temp = temp2;
+                        }
+                    }
                     break;
                 }
             }
@@ -175,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    public void goToDashboard(View view) {
+    public void goToScoreboard(View view) {
         Intent intent = new Intent(getApplicationContext(), ScoreboardActivity.class);
         intent.putExtra("list", time_list);
         startActivity(intent);
